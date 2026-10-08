@@ -4,49 +4,30 @@ namespace Abolaradev\Authora;
 
 use Abolaradev\Authora\Contracts\ShouldAuthenticate;
 use Abolaradev\Authora\Services\OtpBasedAuthentication;
-use Illuminate\Support\Arr;
+use Abolaradev\Authora\Services\PasswordBasedAuthentication;
 
 class Authora
 {
     /**
-     * Resolve an authentication action class from the configuration.
+     * Register a new user using password-based authentication.
      *
-     * @param string $action The authentication action key.
-     * @return class-string
-     */
-    private function authenticateAction(string $action): string
-    {
-        $config = config('authora.actions.authentication');
-
-        return Arr::get($config, $action);
-    }
-
-    /**
-     * Register a new user using password authentication.
-     *
-     * @param array<string, mixed> $credentials
-     * @return \Abolaradev\Authora\Contracts\ShouldAuthenticate
+     * @param array $credentials
+     * @return ShouldAuthenticate
      */
     public function register(array $credentials): ShouldAuthenticate
     {
-        $registerClass = $this->authenticateAction('password.register');
-
-        return (new $registerClass)->validate($credentials)
-                                   ->authenticate();
+        return (new PasswordBasedAuthentication($credentials))->register();
     }
 
     /**
      * Authenticate a user using password credentials.
      *
-     * @param array<string, mixed> $credentials
-     * @return \Abolaradev\Authora\Contracts\ShouldAuthenticate
+     * @param array $credentials
+     * @return ShouldAuthenticate
      */
     public function login(array $credentials): ShouldAuthenticate
     {
-        $loginClass = $this->authenticateAction('password.login');
-
-        return (new $loginClass)->validate($credentials)
-                                ->authenticate();
+        return (new PasswordBasedAuthentication($credentials))->login();
     }
 
     /**
@@ -65,7 +46,7 @@ class Authora
      */
     public function logout(): void
     {
-        $logoutClass = config('authora.logout');
+        $logoutClass = config('authora.actions.logout');
 
         (new $logoutClass)->handle();
     }
