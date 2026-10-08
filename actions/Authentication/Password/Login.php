@@ -5,6 +5,7 @@ namespace App\Actions\Authentication\Password;
 use Abolaradev\Authora\Contracts\ShouldAuthenticate;
 use Abolaradev\Authora\Traits\WithAuthenticationRedirect;
 use Abolaradev\Authora\Traits\WithValidation;
+use App\Actions\Rules\Email;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -18,7 +19,7 @@ class Login implements ShouldAuthenticate
     protected function rules(): array
     {
         return [
-            'email' => 'required | email:filter',
+            'email' => Email::rules(),
             'password' => 'required',
             'remember' => ' boolean'
         ];

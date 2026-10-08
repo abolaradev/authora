@@ -5,11 +5,13 @@ namespace App\Actions\Authentication\Password;
 use Abolaradev\Authora\Contracts\ShouldAuthenticate;
 use Abolaradev\Authora\Traits\WithAuthenticationRedirect;
 use Abolaradev\Authora\Traits\WithValidation;
-use App\Actions\Rules\AuthoraPassword;
+use App\Actions\Rules\Email;
+use App\Actions\Rules\Password;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Models\User;
+use Illuminate\Support\Arr;
 
 class Register implements ShouldAuthenticate
 {
@@ -19,8 +21,8 @@ class Register implements ShouldAuthenticate
     {
         return [
             'name' => 'required | alpha_dash',
-            'email' => 'required  | email:filter,rfc,dns | unique:users',
-            'password' => AuthoraPassword::rules(),
+            'email' => Arr::flatten([Email::rules(),'unique:users']),
+            'password' => Password::rules(),
             'password_confirmation' => 'same:password'
         ];
     }
