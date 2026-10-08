@@ -16,6 +16,11 @@ class Login implements ShouldAuthenticate
 {
     use WithValidation , WithAuthenticationRedirect;
 
+    /**
+     * Get the validation rules for password authentication.
+     *
+     * @return array
+     */
     protected function rules(): array
     {
         return [
@@ -25,6 +30,13 @@ class Login implements ShouldAuthenticate
         ];
     }
 
+    /**
+     * Authenticate the user using their email and password.
+     *
+     * @return static
+     *
+     * @throws ValidationException
+     */
     public function authenticate(): static
     {
         $validated = $this->getValidatedData();

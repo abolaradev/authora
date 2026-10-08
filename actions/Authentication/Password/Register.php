@@ -17,6 +17,11 @@ class Register implements ShouldAuthenticate
 {
     use WithValidation , WithAuthenticationRedirect;
 
+    /**
+     * Get the validation rules for user registration.
+     *
+     * @return array
+     */
     protected function rules(): array
     {
         return [
@@ -27,7 +32,11 @@ class Register implements ShouldAuthenticate
         ];
     }
 
-
+    /**
+     * Register and authenticate a new user.
+     *
+     * @return static
+     */
     public function authenticate(): static
     {
         $validated = $this->getValidatedData();
