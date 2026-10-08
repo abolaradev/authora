@@ -47,4 +47,14 @@ class Authora
         return (new $loginClass)->validate($credentials)
                                 ->authenticate();
     }
+
+    /**
+     * Log out the authenticated user.
+     */
+    public function logout(): void
+    {
+        $logoutClass = config('authora.logout');
+
+        (new $logoutClass)->handle();
+    }
 }
