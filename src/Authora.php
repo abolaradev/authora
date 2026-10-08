@@ -3,6 +3,7 @@
 namespace Abolaradev\Authora;
 
 use Abolaradev\Authora\Contracts\ShouldAuthenticate;
+use Abolaradev\Authora\Services\OtpBasedAuthentication;
 use Illuminate\Support\Arr;
 
 class Authora
@@ -15,7 +16,7 @@ class Authora
      */
     private function authenticateAction(string $action): string
     {
-        $config = config('authora.authenticate');
+        $config = config('authora.actions.authentication');
 
         return Arr::get($config, $action);
     }
@@ -46,6 +47,17 @@ class Authora
 
         return (new $loginClass)->validate($credentials)
                                 ->authenticate();
+    }
+
+    /**
+     * Create an OTP-based authentication service.
+     *
+     * @param array $credentials
+     * @return OtpBasedAuthentication
+     */
+    public function otp(array $credentials): OtpBasedAuthentication
+    {
+        return new OtpBasedAuthentication($credentials);
     }
 
     /**
