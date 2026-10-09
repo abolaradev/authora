@@ -3,6 +3,7 @@
 namespace Abolaradev\Authora;
 
 use Abolaradev\Authora\Contracts\ShouldAuthenticate;
+use Abolaradev\Authora\Services\OAuthBasedAuthentication;
 use Abolaradev\Authora\Services\OtpBasedAuthentication;
 use Abolaradev\Authora\Services\PasswordBasedAuthentication;
 
@@ -42,11 +43,22 @@ class Authora
     }
 
     /**
+     * Create an OAuth-based authentication service for the given provider.
+     *
+     * @param string $provider The OAuth provider name.
+     * @return OAuthBasedAuthentication
+     */
+    public function oauth(string $provider): OAuthBasedAuthentication
+    {
+        return new OAuthBasedAuthentication($provider);
+    }
+
+    /**
      * Log out the authenticated user.
      */
     public function logout(): void
     {
-        $logoutClass = config('authora.actions.logout');
+        $logoutClass = config('authora.logout');
 
         (new $logoutClass)->handle();
     }
