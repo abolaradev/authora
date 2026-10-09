@@ -17,7 +17,8 @@ class Authora
      */
     public function register(array $credentials): ShouldAuthenticate
     {
-        return (new PasswordBasedAuthentication($credentials))->register();
+        return app()->make(PasswordBasedAuthentication::class,['credentials' => $credentials])
+                    ->register();
     }
 
     /**
@@ -28,7 +29,8 @@ class Authora
      */
     public function login(array $credentials): ShouldAuthenticate
     {
-        return (new PasswordBasedAuthentication($credentials))->login();
+        return app()->make(PasswordBasedAuthentication::class,['credentials' => $credentials])
+                    ->login();
     }
 
     /**
@@ -39,7 +41,7 @@ class Authora
      */
     public function otp(array $credentials): OtpBasedAuthentication
     {
-        return new OtpBasedAuthentication($credentials);
+        return app()->make(OtpBasedAuthentication::class,['credentials' => $credentials]);
     }
 
     /**
@@ -50,7 +52,7 @@ class Authora
      */
     public function oauth(string $provider): OAuthBasedAuthentication
     {
-        return new OAuthBasedAuthentication($provider);
+        return app()->make(OAuthBasedAuthentication::class , ['provider'=>$provider]);
     }
 
     /**
