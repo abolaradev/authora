@@ -2,8 +2,6 @@
 
 namespace Abolaradev\Authora\Services;
 
-use Illuminate\Support\Arr;
-
 abstract class AuthenticationService
 {
     /**
@@ -11,7 +9,7 @@ abstract class AuthenticationService
      *
      * @param array $credentials
      */
-    public function __construct(private array $credentials=[])
+    public function __construct(private string|array $credentials=[])
     {}
 
     /**
@@ -19,21 +17,8 @@ abstract class AuthenticationService
      *
      * @return array<string, mixed>
      */
-    protected function getCredentials(): array
+    protected function getCredentials(): string|array
     {
         return $this->credentials;
-    }
-
-    /**
-     * Resolve an authentication action from the configuration.
-     *
-     * @param string $action The authentication action key.
-     * @return class-string
-     */
-    protected function action(string $action): string
-    {
-        $config = config('authora.actions');
-
-        return Arr::get($config, $action);
     }
 }

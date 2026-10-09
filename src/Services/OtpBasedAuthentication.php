@@ -13,7 +13,7 @@ class OtpBasedAuthentication extends AuthenticationService
      */
     public function dispatch(): mixed
     {
-        $otpSendClass = $this->action('authentication.otp.dispatch');
+        $otpSendClass = config('authora.authentication.otp.dispatch');
 
         return (new $otpSendClass)->validate($this->getCredentials())
                                   ->dispatch();
@@ -26,7 +26,7 @@ class OtpBasedAuthentication extends AuthenticationService
      */
     public function verify(): ShouldAuthenticate
     {
-        $otpVerifyClass = $this->action('authentication.otp.verify');
+        $otpVerifyClass = config('authora.authentication.otp.verify');
 
         return (new $otpVerifyClass)->validate($this->getCredentials())
                                     ->authenticate();

@@ -13,7 +13,7 @@ class PasswordBasedAuthentication extends AuthenticationService
      */
     public function register(): ShouldAuthenticate
     {
-        $registerClass = $this->action('authentication.password.register');
+        $registerClass = config('authora.authentication.password.register');
        
         return (new $registerClass)->validate($this->getCredentials())
                                    ->authenticate();
@@ -26,7 +26,7 @@ class PasswordBasedAuthentication extends AuthenticationService
      */
     public function login(): ShouldAuthenticate
     {
-        $loginClass = $this->action('authentication.password.login');
+        $loginClass = config('authora.authentication.password.login');
 
          return (new $loginClass)->validate($this->getCredentials())
                                  ->authenticate();
