@@ -15,18 +15,21 @@ class OAuthController extends Controller
      */
     public function redirect(string $provider)
     {
-        return $this->provider($provider)->redirect(); 
+        return $this->provider($provider)
+                    ->redirect(); 
     }
 
     /**
-     * Handle the OAuth provider callback and authenticate the user.
+     * Handle the OAuth provider callback and authenticate the user , and redirect them.
      *
      * @param string $provider The OAuth provider name.
      * @return \Illuminate\Http\RedirectResponse
      */
     public function callback(string $provider)
     {
-        return $this->provider($provider)->authenticate(); 
+        return $this->provider($provider)
+                    ->authenticate()
+                    ->thenRedirect();
     }
 
     /**

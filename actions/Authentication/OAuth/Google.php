@@ -17,9 +17,9 @@ class Google implements ShouldAuthenticateWithOAuth
     /**
      * Authenticate the user using their Google account.
      *
-     * @return RedirectResponse
+     * @return static
      */
-    public function authenticate(): RedirectResponse
+    public function authenticate(): static
     {
         $googleUser = $this->getUser();
 
@@ -39,6 +39,6 @@ class Google implements ShouldAuthenticateWithOAuth
 
         Session::regenerate();
 
-        return $this->thenRedirect();
+        return $this;
     }
 }
