@@ -2,7 +2,6 @@
 
 namespace Abolaradev\Authora\Contracts;
 
-use Illuminate\Http\RedirectResponse;
 
 interface ShouldAuthenticate
 {
@@ -11,5 +10,5 @@ interface ShouldAuthenticate
      *
      * @return static
      */
-    public function authenticate(): static|RedirectResponse;
+    public function authenticate(): static;
 }
