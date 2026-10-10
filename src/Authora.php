@@ -6,6 +6,7 @@ use Abolaradev\Authora\Contracts\ShouldAuthenticate;
 use Abolaradev\Authora\Services\OAuthBasedAuthentication;
 use Abolaradev\Authora\Services\OtpBasedAuthentication;
 use Abolaradev\Authora\Services\PasswordBasedAuthentication;
+use Abolaradev\Authora\Services\UserEmailVerification;
 
 class Authora
 {
@@ -17,8 +18,8 @@ class Authora
      */
     public function register(array $credentials): ShouldAuthenticate
     {
-        return app()->make(PasswordBasedAuthentication::class,['credentials' => $credentials])
-                    ->register();
+        return app(PasswordBasedAuthentication::class,['credentials' => $credentials])
+               ->register();
     }
 
     /**
@@ -29,8 +30,8 @@ class Authora
      */
     public function login(array $credentials): ShouldAuthenticate
     {
-        return app()->make(PasswordBasedAuthentication::class,['credentials' => $credentials])
-                    ->login();
+        return app(PasswordBasedAuthentication::class,['credentials' => $credentials])
+               ->login();
     }
 
     /**
@@ -41,7 +42,7 @@ class Authora
      */
     public function otp(array $credentials): OtpBasedAuthentication
     {
-        return app()->make(OtpBasedAuthentication::class,['credentials' => $credentials]);
+        return app(OtpBasedAuthentication::class,['credentials' => $credentials]);
     }
 
     /**
@@ -52,7 +53,7 @@ class Authora
      */
     public function oauth(string $provider): OAuthBasedAuthentication
     {
-        return app()->make(OAuthBasedAuthentication::class , ['provider'=>$provider]);
+        return app(OAuthBasedAuthentication::class , ['credentials' => $provider]);
     }
 
     /**
@@ -63,5 +64,15 @@ class Authora
         $logoutClass = config('authora.logout');
 
         (new $logoutClass)->handle();
+    }
+
+    /**
+     * Send an email verification notification to the user.
+     *
+     * @return mixed
+     */
+    public function sendVerificationEmail(): mixed
+    {
+        return app(UserEmailVerification::class)->send();
     }
 }
