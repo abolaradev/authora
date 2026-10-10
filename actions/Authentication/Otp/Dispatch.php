@@ -2,6 +2,7 @@
 
 namespace App\Actions\Authentication\Otp;
 
+use Abolaradev\Authora\Contracts\ShouldSendNotification;
 use Abolaradev\Authora\Traits\WithAuthenticationRedirect;
 use Abolaradev\Authora\Traits\WithValidation;
 use Abolaradev\Otp\Exceptions\OtpException;
@@ -9,7 +10,7 @@ use Abolaradev\Otp\Facades\Otp;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 
-class Dispatch
+class Dispatch implements ShouldSendNotification
 {
     use WithValidation , WithAuthenticationRedirect;
 
@@ -32,7 +33,7 @@ class Dispatch
      *
      * @throws ValidationException
      */
-    public function dispatch(): static
+    public function send(): static
     {
         try {
 
