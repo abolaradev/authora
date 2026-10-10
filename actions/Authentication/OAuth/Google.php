@@ -30,10 +30,13 @@ class Google implements ShouldAuthenticateWithOAuth
             ,
             [
                 'name' => $googleUser->getName(),
-                'email' => $googleUser->getEmail(),
-                'email_verified_at' => now()
+                'email' => $googleUser->getEmail()
             ]
         );
+
+        $user->forceFill([
+            'email_verified_at' => now()
+        ])->save();
 
         Auth::login($user);
 

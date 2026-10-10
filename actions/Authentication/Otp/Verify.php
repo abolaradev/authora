@@ -49,13 +49,18 @@ class Verify implements ShouldAuthenticate
                ->verify();
                
             $user=User::updateOrCreate(
-                ['mobile' => $mobile]
+                [
+                    'mobile' => $mobile
+                ]
                 ,
                 [
                     'mobile' => $mobile,
-                    'mobile_verified_at' => now()
                 ]
             );
+
+            $user->forceFill([
+                'mobile_verified_at' => now()
+            ])->save();
             
             Auth::login($user);
 
