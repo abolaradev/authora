@@ -48,7 +48,7 @@ class UserEmailVerification
      * @param string $key The configuration key to retrieve.
      * @return string
      */
-    private static function emailVerificationConfig(string $key): string
+    private static function emailVerificationConfig(string $key): ?string
     {
         return config("authora.verification.email.$key");
     }
