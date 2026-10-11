@@ -2,11 +2,13 @@
 
 namespace Abolaradev\Authora;
 
+use Abolaradev\Authora\Actions\Password\SendResetPasswordLink;
 use Abolaradev\Authora\Contracts\ShouldAuthenticate;
 use Abolaradev\Authora\Services\OAuthBasedAuthentication;
 use Abolaradev\Authora\Services\OtpBasedAuthentication;
 use Abolaradev\Authora\Services\PasswordBasedAuthentication;
 use Abolaradev\Authora\Services\UserEmailVerification;
+use Abolaradev\Authora\Services\UserResetPassword;
 
 class Authora
 {
@@ -74,5 +76,16 @@ class Authora
     public function sendVerificationEmail(): mixed
     {
         return app(UserEmailVerification::class)->send();
+    }
+
+    /**
+     * Resolve the password reset service with the given credentials.
+     *
+     * @param array $credentials
+     * @return UserResetPassword
+     */
+    public function password(array $credentials): UserResetPassword
+    {
+        return app(UserResetPassword::class , ['credentials' => $credentials]);
     }
 }
