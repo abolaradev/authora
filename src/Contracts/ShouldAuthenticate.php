@@ -7,8 +7,6 @@ interface ShouldAuthenticate
 {
     /**
      * Authenticate the user.
-     *
-     * @return static
      */
-    public function authenticate(): static;
+    public function authenticate();
 }
