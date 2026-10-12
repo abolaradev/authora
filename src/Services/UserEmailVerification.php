@@ -8,28 +8,16 @@ use Illuminate\Notifications\Messages\MailMessage;
 class UserEmailVerification
 {
     /**
-     * Send the email verification notification using the configured action.
-     *
-     * @return mixed
-     */
-    public function send(): mixed
-    {
-        $emailVerificationClass = self::emailVerificationConfig('send');
-
-        return (new $emailVerificationClass)->send();
-    }
-
-    /**
-     * Configure the email verification notification's subject and view.
+     * Configure and customize the email verification notification's subject and view.
      *
      * @return void
      */
-    public static function configure(): void
+    public static function customization(): void
     {
-        $subject = self::emailVerificationConfig('subject');
-        $view = self::emailVerificationConfig('view');
+        $subject = config("authora.verification.email.subject");
+        $view = config("authora.verification.email.view");
 
-        if(!empty($subject) && !empty($view)){
+        if(!is_null($subject) && !is_null($view)){
 
             VerifyEmail::toMailUsing(function(object $notifiable, string $url) use($subject,$view) {
                 return (new MailMessage)
@@ -40,16 +28,5 @@ class UserEmailVerification
                     ]);
             });
         }
-    }
-
-    /**
-     * Retrieve an email verification setting from the package configuration.
-     *
-     * @param string $key The configuration key to retrieve.
-     * @return string
-     */
-    private static function emailVerificationConfig(string $key): ?string
-    {
-        return config("authora.verification.email.$key");
     }
 }

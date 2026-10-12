@@ -2,10 +2,11 @@
 
 namespace Abolaradev\Authora\Services;
 
-use Abolaradev\Authora\Contracts\ShouldAuthenticate;
-
-class OtpBasedAuthentication extends AuthenticationService
+class OtpBasedAuthentication
 {
+    public function __construct(private array $credentials)
+    {}
+
     /**
      * Dispatch an OTP using the configured authentication action.
      *
@@ -15,20 +16,20 @@ class OtpBasedAuthentication extends AuthenticationService
     {
         $otpSendClass = config('authora.authentication.otp.dispatch');
 
-        return (new $otpSendClass)->validate($this->getCredentials())
-                                  ->dispatch();
+        return (new $otpSendClass)->validate($this->credentials)
+                                  ->send();
     }
 
     /**
      * Verify the OTP using the configured authentication action.
      *
-     * @return ShouldAuthenticate
+     * @return mixed
      */
-    public function verify(): ShouldAuthenticate
+    public function verify(): mixed
     {
         $otpVerifyClass = config('authora.authentication.otp.verify');
 
-        return (new $otpVerifyClass)->validate($this->getCredentials())
+        return (new $otpVerifyClass)->validate($this->credentials)
                                     ->authenticate();
     }
 }

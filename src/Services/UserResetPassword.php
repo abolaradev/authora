@@ -2,8 +2,11 @@
 
 namespace Abolaradev\Authora\Services;
 
-class UserResetPassword extends AuthenticationService
+class UserResetPassword
 {
+    public function __construct(private array $credentials)
+    {}
+
     /**
      * Validate the credentials and send a password reset link.
      *
@@ -13,7 +16,7 @@ class UserResetPassword extends AuthenticationService
     {
         $sendResetLinkClass = config('authora.password.reset');
 
-        return (new $sendResetLinkClass)->validate($this->getCredentials())
+        return (new $sendResetLinkClass)->validate($this->credentials)
                                         ->send();
     }
 
@@ -26,7 +29,7 @@ class UserResetPassword extends AuthenticationService
     {
         $saveNewPasswordClass = config('authora.password.save');
 
-        return (new $saveNewPasswordClass)->validate($this->getCredentials())
-                                            ->save();
+        return (new $saveNewPasswordClass)->validate($this->credentials)
+                                          ->save();
     }
 }
