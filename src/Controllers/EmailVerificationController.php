@@ -2,6 +2,7 @@
 
 namespace Abolaradev\Authora\Controllers;
 
+use Abolaradev\Authora\Traits\HandlesAuthRedirects;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
@@ -9,10 +10,12 @@ use Illuminate\Routing\Controller;
 
 class EmailVerificationController extends Controller
 {
+    use HandlesAuthRedirects;
+
     /**
      * Display the email verification notice if a view is configured.
      *
-     * @return \Illuminate\Contracts\View\View|null
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function notice(): ?View
     {
@@ -33,9 +36,8 @@ class EmailVerificationController extends Controller
      */
     public function verify(EmailVerificationRequest $request): RedirectResponse
     {
-        $dashboard = config('authora.redirect_to');
         $request->fulfill();
 
-        return redirect($dashboard);
+        return $this->redirectToDashboard();
     }
 }

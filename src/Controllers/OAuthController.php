@@ -3,6 +3,7 @@
 namespace Abolaradev\Authora\Controllers;
 
 use Abolaradev\Authora\Contracts\ShouldAuthenticateWithOAuth;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller;
 
 class OAuthController extends Controller
@@ -11,9 +12,9 @@ class OAuthController extends Controller
      * Redirect the user to the specified OAuth provider.
      *
      * @param string $provider The OAuth provider name.
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function redirect(string $provider)
+    public function redirect(string $provider): RedirectResponse
     {
         return $this->provider($provider)
                     ->redirect(); 
@@ -25,15 +26,17 @@ class OAuthController extends Controller
      * @param string $provider The OAuth provider name.
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function callback(string $provider)
+    public function callback(string $provider): RedirectResponse
     {
         return $this->provider($provider)
-                    ->authenticate()
-                    ->thenRedirect();
+                    ->authenticate();
     }
 
     /**
      * Resolve the configured OAuth provider.
+     * 
+     * @param string $provider The OAuth provider name.
+     * @return \Abolaradev\Authora\Contracts\ShouldAuthenticateWithOAuth
      */
     protected function provider(string $provider): ShouldAuthenticateWithOAuth
     {
