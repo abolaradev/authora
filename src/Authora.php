@@ -108,4 +108,19 @@ class Authora
     {
         return app(UserResetPassword::class,['credentials'=>$this->credentials]);
     }
+
+    /**
+     * Create a rate limiter for the given authentication action.
+     *
+     * @param  AuthenticationAction  $action  The authentication action to limit.
+     * @param  Closure|null  $onLimit  The optional callback executed when the rate limit is exceeded.
+     * @return AuthRateLimiter
+     */
+    public function rateLimiter(AuthenticationAction $action , ?Closure $onLimit = null): AuthRateLimiter
+    {
+        return app(AuthRateLimiter::class , [
+            'action' => $action,
+            'onLimit' => $onLimit
+        ]);
+    }
 }

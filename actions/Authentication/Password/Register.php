@@ -1,21 +1,23 @@
 <?php
 
-namespace App\Actions\Authentication\Password;
+namespace Abolaradev\Authora\Actions\Authentication\Password;
 
-use Abolaradev\Authora\Contracts\ShouldAuthenticate;
-use Abolaradev\Authora\Traits\WithAuthenticationRedirect;
-use Abolaradev\Authora\Traits\WithValidation;
 use App\Actions\Rules\Email;
 use App\Actions\Rules\Password;
+use Abolaradev\Authora\Contracts\ShouldAuthenticate;
+use Abolaradev\Authora\Enums\AuthenticationAction;
+use Abolaradev\Authora\Facades\Authora;
+use Abolaradev\Authora\Traits\HandlesAuthRedirects;
+use Abolaradev\Authora\Traits\WithValidation;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use App\Models\User;
-use Illuminate\Support\Arr;
 
 class Register implements ShouldAuthenticate
 {
-    use WithValidation , WithAuthenticationRedirect;
+    use WithValidation , HandlesAuthRedirects;
 
     /**
      * Get the validation rules for user registration.
@@ -25,7 +27,7 @@ class Register implements ShouldAuthenticate
     protected function rules(): array
     {
         return [
-            'name' => 'required | alpha_dash',
+            'name' => 'required | regex:/^[\pL\s]+$/u',
             'email' => Arr::flatten([Email::rules(),'unique:users']),
             'password' => Password::rules(),
             'password_confirmation' => 'same:password'
@@ -34,25 +36,29 @@ class Register implements ShouldAuthenticate
 
     /**
      * Register and authenticate a new user.
-     *
-     * @return static
      */
-    public function authenticate(): static
+    public function authenticate()
     {
-        $validated = $this->getValidatedData();
+        $execute = Authora::rateLimiter(AuthenticationAction::Register)
+                          ->execute();
+        
+        if($execute){
+            
+            $validated = $this->getValidatedData();
 
-        $validated['password'] = Hash::make($validated['password']);
+            $validated['password'] = Hash::make($validated['password']);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password']
-        ]);
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password']
+            ]);
+            
+            Auth::login($user);
 
-        Auth::login($user);
+            Session::regenerate();
 
-        Session::regenerate();
-
-        return $this;
+            return $this->redirectToDashboard();
+        }                    
     }
 }

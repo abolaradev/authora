@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Actions\Authentication\Password;
+namespace Abolaradev\Authora\Actions\Authentication\Password;
 
-use Abolaradev\Authora\Contracts\ShouldAuthenticate;
-use Abolaradev\Authora\Traits\WithAuthenticationRedirect;
-use Abolaradev\Authora\Traits\WithValidation;
 use App\Actions\Rules\Email;
+use Abolaradev\Authora\Contracts\ShouldAuthenticate;
+use Abolaradev\Authora\Enums\AuthenticationAction;
+use Abolaradev\Authora\Facades\Authora;
+use Abolaradev\Authora\Traits\HandlesAuthRedirects;
+use Abolaradev\Authora\Traits\WithValidation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -14,7 +16,7 @@ use App\Models\User;
 
 class Login implements ShouldAuthenticate
 {
-    use WithValidation , WithAuthenticationRedirect;
+    use WithValidation , HandlesAuthRedirects;
 
     /**
      * Get the validation rules for password authentication.
@@ -33,26 +35,29 @@ class Login implements ShouldAuthenticate
     /**
      * Authenticate the user using their email and password.
      *
-     * @return static
-     *
      * @throws ValidationException
      */
-    public function authenticate(): static
+    public function authenticate()
     {
-        $validated = $this->getValidatedData();
+        $execute = Authora::rateLimiter(AuthenticationAction::Login)
+                          ->execute();
+      
+        if($execute){
+             $validated = $this->getValidatedData();
 
-        $user = User::where('email','=',$validated['email'])->first();
+            $user = User::where('email','=',$validated['email'])->first();
 
-        if(!$user || !Hash::check($validated['password'],$user->password)){
-            throw ValidationException::withMessages([
-                 'email' => 'The provided login credentials are incorrect.'
-            ]);
+            if(!$user || !Hash::check($validated['password'],$user->password)){
+                throw ValidationException::withMessages([
+                    'email' => __('auth.failed'),
+                ]);
+            }
+
+            Auth::login($user,$validated['remember'] ?? false);
+
+            Session::regenerate();
+
+            return $this->redirectToDashboard();
         }
-
-        Auth::login($user,$validated['remember'] ?? false);
-
-        Session::regenerate();
-
-        return $this;
     }
 }
