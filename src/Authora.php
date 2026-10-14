@@ -2,90 +2,110 @@
 
 namespace Abolaradev\Authora;
 
-use Abolaradev\Authora\Actions\Password\SendResetPasswordLink;
-use Abolaradev\Authora\Contracts\ShouldAuthenticate;
-use Abolaradev\Authora\Services\OAuthBasedAuthentication;
+use Abolaradev\Authora\Enums\AuthenticationAction;
+use Abolaradev\Authora\Services\AuthRateLimiter;
 use Abolaradev\Authora\Services\OtpBasedAuthentication;
-use Abolaradev\Authora\Services\PasswordBasedAuthentication;
-use Abolaradev\Authora\Services\UserEmailVerification;
 use Abolaradev\Authora\Services\UserResetPassword;
+use Closure;
+use Illuminate\Http\RedirectResponse;
 
 class Authora
 {
+    private array $credentials = [];
+
+    /**
+     * Set the credentials for the current authentication operation.
+     *
+     * @param array $credentials The credentials to be validated and processed.
+     * 
+     * @return $this
+     */
+    public function credentials(array $credentials): static
+    {
+        $this->credentials = $credentials;
+
+        return $this;
+    }
+
     /**
      * Register a new user using password-based authentication.
      *
-     * @param array $credentials
-     * @return ShouldAuthenticate
+     * @return mixed
      */
-    public function register(array $credentials): ShouldAuthenticate
+    public function register(): mixed
     {
-        return app(PasswordBasedAuthentication::class,['credentials' => $credentials])
-               ->register();
+        $registerClass = config('authora.authentication.password.register');
+       
+        return (new $registerClass)->validate($this->credentials)
+                                   ->authenticate();
     }
 
     /**
      * Authenticate a user using password credentials.
      *
-     * @param array $credentials
-     * @return ShouldAuthenticate
+     * @return mixed
      */
-    public function login(array $credentials): ShouldAuthenticate
+    public function login(): mixed
     {
-        return app(PasswordBasedAuthentication::class,['credentials' => $credentials])
-               ->login();
+        $loginClass = config('authora.authentication.password.login');
+
+         return (new $loginClass)->validate($this->credentials)
+                                 ->authenticate();
+    }
+
+    /**
+     * Log out the authenticated user.
+     * 
+     * @return mixed
+     */
+    public function logout(): mixed
+    {
+        $logoutClass = config('authora.logout');
+
+        return (new $logoutClass)->handle();
     }
 
     /**
      * Create an OTP-based authentication service.
      *
-     * @param array $credentials
      * @return OtpBasedAuthentication
      */
-    public function otp(array $credentials): OtpBasedAuthentication
+    public function otp(): OtpBasedAuthentication
     {
-        return app(OtpBasedAuthentication::class,['credentials' => $credentials]);
+        return app(OtpBasedAuthentication::class,['credentials'=>$this->credentials]);
     }
 
     /**
-     * Create an OAuth-based authentication service for the given provider.
+     * Redirect the user to the OAuth provider.
      *
-     * @param string $provider The OAuth provider name.
-     * @return OAuthBasedAuthentication
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function oauth(string $provider): OAuthBasedAuthentication
+    public function oauth(string $provider): RedirectResponse
     {
-        return app(OAuthBasedAuthentication::class , ['credentials' => $provider]);
+        $route = route('oauth.redirect', ['provider' => $provider]);
+
+        return redirect($route);
     }
 
     /**
-     * Log out the authenticated user.
-     */
-    public function logout(): void
-    {
-        $logoutClass = config('authora.logout');
-
-        (new $logoutClass)->handle();
-    }
-
-    /**
-     * Send an email verification notification to the user.
+     * Send the email verification notification using the configured action.
      *
      * @return mixed
      */
-    public function sendVerificationEmail(): mixed
+    public function sendEmailVerificationNotification(): mixed
     {
-        return app(UserEmailVerification::class)->send();
+        $emailVerificationClass = config('authora.verification.email.send');
+
+        return (new $emailVerificationClass)->send();
     }
 
     /**
      * Resolve the password reset service with the given credentials.
      *
-     * @param array $credentials
      * @return UserResetPassword
      */
-    public function password(array $credentials): UserResetPassword
+    public function passwordReset(): UserResetPassword
     {
-        return app(UserResetPassword::class , ['credentials' => $credentials]);
+        return app(UserResetPassword::class,['credentials'=>$this->credentials]);
     }
 }
