@@ -3,7 +3,7 @@
 namespace App\Actions\Authentication\Otp;
 
 use Abolaradev\Authora\Contracts\ShouldSendNotification;
-use Abolaradev\Authora\Traits\WithAuthenticationRedirect;
+use Abolaradev\Authora\Traits\HandlesAuthRedirects;
 use Abolaradev\Authora\Traits\WithValidation;
 use Abolaradev\Otp\Exceptions\OtpException;
 use Abolaradev\Otp\Facades\Otp;
@@ -12,7 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 class Dispatch implements ShouldSendNotification
 {
-    use WithValidation , WithAuthenticationRedirect;
+    use WithValidation , HandlesAuthRedirects;
 
     /**
      * Get the validation rules for OTP recipient.
@@ -50,7 +50,7 @@ class Dispatch implements ShouldSendNotification
         } catch (OtpException $e) {
 
             throw ValidationException::withMessages([
-                'mobile' => $e->getTranslatedMessage()
+                'mobile' => $e->getMessage()
             ]);
 
         }

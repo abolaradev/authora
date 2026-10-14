@@ -4,6 +4,7 @@ namespace App\Actions\Password;
 
 use App\Actions\Rules\Email;
 use App\Actions\Rules\Password as RulesPassword;
+use Abolaradev\Authora\Traits\HandlesAuthRedirects;
 use Abolaradev\Authora\Traits\WithValidation;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -13,7 +14,7 @@ use App\Models\User;
 
 class SaveNewPassword
 {
-    use WithValidation;
+    use WithValidation , HandlesAuthRedirects;
 
     /**
      * Get the validation rules for the password reset form.
@@ -32,12 +33,10 @@ class SaveNewPassword
 
     /**
      * Reset the user's password using the provided token.
-     *
-     * @return string
-     *
+     * 
      * @throws ValidationException If the password reset fails.
      */
-    public function save(): string
+    public function save()
     {
         $validated = $this->getValidatedData();
 
@@ -57,7 +56,9 @@ class SaveNewPassword
                 'password' => __($status)
             ]);
         }
-        
-        return __($status);
+
+        return $this->redirectToLogin()
+                    ->with('status' , __($status));
+       
     }
 }

@@ -3,23 +3,20 @@
 namespace App\Actions\Authentication\OAuth;
 
 use Abolaradev\Authora\Contracts\ShouldAuthenticateWithOAuth;
-use Abolaradev\Authora\Traits\WithAuthenticationRedirect;
+use Abolaradev\Authora\Traits\HandlesAuthRedirects;
 use Abolaradev\Authora\Traits\WithOAuthAuthentication;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Models\User;
 
 class Google implements ShouldAuthenticateWithOAuth
 {
-    use WithOAuthAuthentication , WithAuthenticationRedirect;
+    use WithOAuthAuthentication , HandlesAuthRedirects;
 
     /**
      * Authenticate the user using their Google account.
-     *
-     * @return static
      */
-    public function authenticate(): static
+    public function authenticate()
     {
         $googleUser = $this->getUser();
 
@@ -42,6 +39,6 @@ class Google implements ShouldAuthenticateWithOAuth
 
         Session::regenerate();
 
-        return $this;
+        return $this->redirectToDashboard();
     }
 }
