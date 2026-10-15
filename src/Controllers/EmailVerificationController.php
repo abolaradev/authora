@@ -19,7 +19,7 @@ class EmailVerificationController extends Controller
      */
     public function notice(): ?View
     {
-        $view = config('authora.verification.notice_view');
+        $view = config('authora.options.email_verification.notice_view');
 
         if(is_null($view)){
             return null;

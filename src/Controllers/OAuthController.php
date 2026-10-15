@@ -40,7 +40,7 @@ class OAuthController extends Controller
      */
     protected function provider(string $provider): ShouldAuthenticateWithOAuth
     {
-        $providerClass = config("authora.authentication.oauth.providers.{$provider}");
+        $providerClass = config("authora.options.oauth.providers.{$provider}");
 
         return new $providerClass($provider);
     }
