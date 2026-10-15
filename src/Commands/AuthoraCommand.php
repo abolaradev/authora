@@ -3,17 +3,41 @@
 namespace Abolaradev\Authora\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+
+use function Laravel\Prompts\info;
+use function Orchestra\Sidekick\working_path;
 
 class AuthoraCommand extends Command
 {
-    public $signature = 'authora';
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    public $signature = 'authora:install';
 
-    public $description = 'My command';
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    public $description = 'Install Authora actions into the application.';
 
-    public function handle(): int
+    /**
+     * Execute the console command.
+     */
+    public function handle()
     {
-        $this->comment('All done');
+        $actions = working_path('actions');
+        $app = app_path('Actions');
 
-        return self::SUCCESS;
+        if(!File::isDirectory($app)){
+            File::makeDirectory($app,recursive:true);
+        }
+
+        File::copyDirectory($actions,$app);
+
+        info('Authora actions installed successfully.');
     }
 }
