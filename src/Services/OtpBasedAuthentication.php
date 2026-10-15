@@ -2,10 +2,19 @@
 
 namespace Abolaradev\Authora\Services;
 
+use Abolaradev\Authora\Enums\Feature;
+
 class OtpBasedAuthentication
 {
-    public function __construct(private array $credentials)
-    {}
+    private array $credentials;
+
+    private array $actions;
+
+    public function __construct(array $credentials)
+    {
+        $this->credentials = $credentials;
+        $this->actions = Feature::otpActions();
+    }
 
     /**
      * Dispatch an OTP using the configured authentication action.
@@ -14,10 +23,10 @@ class OtpBasedAuthentication
      */
     public function dispatch(): mixed
     {
-        $otpSendClass = config('authora.authentication.otp.dispatch');
+        $otpSendClass = $this->actions['dispatch'];
 
-        return (new $otpSendClass)->validate($this->credentials)
-                                  ->send();
+        return app($otpSendClass)->validate($this->credentials)
+                                 ->send();
     }
 
     /**
@@ -27,9 +36,9 @@ class OtpBasedAuthentication
      */
     public function verify(): mixed
     {
-        $otpVerifyClass = config('authora.authentication.otp.verify');
+        $otpVerifyClass = $this->actions['verify'];
 
-        return (new $otpVerifyClass)->validate($this->credentials)
+        return app($otpVerifyClass)->validate($this->credentials)
                                     ->authenticate();
     }
 }

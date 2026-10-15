@@ -2,10 +2,19 @@
 
 namespace Abolaradev\Authora\Services;
 
+use Abolaradev\Authora\Enums\Feature;
+
 class UserResetPassword
 {
-    public function __construct(private array $credentials)
-    {}
+    private array $credentials;
+
+    private array $actions;
+
+    public function __construct(array $credentials)
+    {
+        $this->credentials = $credentials;
+        $this->actions = Feature::resetPasswordActions();
+    }
 
     /**
      * Validate the credentials and send a password reset link.
@@ -14,10 +23,10 @@ class UserResetPassword
      */
     public function sendResetLink(): string
     {
-        $sendResetLinkClass = config('authora.password.reset');
+        $sendResetLinkClass = $this->actions['send_link'];
 
-        return (new $sendResetLinkClass)->validate($this->credentials)
-                                        ->send();
+        return app($sendResetLinkClass)->validate($this->credentials)
+                                       ->send();
     }
 
     /**
@@ -27,9 +36,9 @@ class UserResetPassword
      */
     public function saveNewPassword(): string
     {
-        $saveNewPasswordClass = config('authora.password.save');
+        $saveNewPasswordClass = $this->actions['save_password'];
 
-        return (new $saveNewPasswordClass)->validate($this->credentials)
-                                          ->save();
+        return app($saveNewPasswordClass)->validate($this->credentials)
+                                         ->save();
     }
 }
