@@ -4,8 +4,9 @@ namespace Abolaradev\Authora;
 
 use Illuminate\Support\ServiceProvider;
 use Abolaradev\Authora\Commands\AuthoraCommand;
-use Livewire\Livewire;
-use Illuminate\Support\Facades\Blade;
+use Abolaradev\Authora\Services\AuthRateLimiter;
+use Abolaradev\Authora\Services\OtpBasedAuthentication;
+use Abolaradev\Authora\Services\UserResetPassword;
 
 class AuthoraServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,10 @@ class AuthoraServiceProvider extends ServiceProvider
             __DIR__.'/../config/authora.php',
             'authora'
         );
+
+        $this->app->bind(OtpBasedAuthentication::class);
+        $this->app->bind(UserResetPassword::class);
+        $this->app->bind(AuthRateLimiter::class);
     }
 
     /**
@@ -26,21 +31,11 @@ class AuthoraServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
-        // Register the package views as a Livewire namespace
-        Livewire::addNamespace(
-            namespace: 'authora',
-            viewPath: __DIR__ . '/../resources/views/livewire',
-        );
-
-        // Register the package Blade components namespace
-        Blade::componentNamespace(__DIR__ . '/../resources/views/components','authora');
-
         // Load the package routes
         $this->loadRoutesFrom(__DIR__.'/../routes/authora.php');
 
-        // Load the package views
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'authora');
+        // Load the translation files
+        $this->loadTranslationsFrom(__DIR__.'/../lang');
 
         // Publishing is only available when running from the console
         if (! $this->app->runningInConsole()) {
@@ -52,15 +47,9 @@ class AuthoraServiceProvider extends ServiceProvider
             __DIR__.'/../config/authora.php' => config_path('authora.php'),
         ], ['authora', 'authora-config']);
 
-        // Publish the package views
         $this->publishes([
-            __DIR__.'/../resources/views' => resource_path('views/vendor/authora'),
-        ], ['authora', 'authora-views']);
-
-        // Publish the package assets
-        $this->publishes([
-            __DIR__.'/../resources/dist' => public_path('vendor/authora'),
-        ], ['authora', 'authora-assets']);
+            __DIR__.'/../lang' => lang_path()
+        ],['authora', 'authora-lang']);
 
         // Publish the package migrations
         $this->publishesMigrations([
