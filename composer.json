@@ -17,9 +17,12 @@
     ],
     "require": {
         "php": "^8.2",
+        "abolaradev/otp": "^1.2",
+        "farbodtf/persian-validation": "^1.0",
         "iamfarhad/validation": "^4.2",
         "illuminate/contracts": "^11.0||^12.0||^13.0",
         "illuminate/support": "^12.0||^13.0",
+        "laravel/socialite": "^5.31",
         "livewire/livewire": "^4.0",
         "spatie/laravel-package-tools": "^1.16"
     },
